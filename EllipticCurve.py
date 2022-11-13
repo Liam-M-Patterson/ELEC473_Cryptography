@@ -1,20 +1,6 @@
-import random
-from os import urandom
-from binascii import hexlify
-import codecs
 from mod_sqrt import modsqrt
 from typing import Optional
 from dataclasses import dataclass
-
-
-def int_length_in_byte(n: int):
-    assert n >= 0
-    length = 0
-    while n:
-        n >>= 8
-        length += 1
-    return length
-
 @dataclass
 class Point:
 	x: Optional[int]
@@ -87,9 +73,6 @@ class EllipticCurve:
 		rhs = p.x*p.x*p.x + self.a*p.x + self.b
 
 		return p.is_at_infinity() or ( (lhs-rhs) % self.p == 0 )
-	
-	
-
 
 	def neg(self, p):
 		return Point(p.x, -p.y % self.p)
@@ -154,130 +137,12 @@ class EllipticCurve:
 		y =  modsqrt(rhs, self.p)
 		return y
 
-	# generates a random private key in order n
-	def gen_private_key(self):
-		order_bits = 0
-		order = self.n
-
-		while order > 0:
-			order >>= 1
-			order_bits += 1
-
-		order_bytes = (order_bits + 7) // 8
-		extra_bits = order_bytes * 8 - order_bits
-
-		rand = int(hexlify(urandom(order_bytes)), 16)
-		rand >>= extra_bits
-
-		while rand >= self.n:
-			rand = int(hexlify(urandom(order_bytes)), 16)
-			rand >>= extra_bits
-
-		return rand
-
-	def gen_key_pair(self):
-
-		pubKey = Point(0.0, 0.0)
-		while pubKey.x == 0.0 or pubKey.y == 0.0 :
-			self.privateKey =  self.gen_private_key()
-			
-			pubKey = self.multiply(self.g, self.privateKey)	
-		return pubKey
-
-	
-	def encrypt(self, plaintext, public_key):
-
-		print('encrypting')
-		M = self.encode_point(plaintext)
-		print('M:', M)
-		return self.encrypt_point(M, public_key)
-
-
-
-	def decrypt(self, private_key, ciphertext):
-
-		M = self.decrypt_point(private_key, ciphertext)
-		print('M ', M)
-		decoded = self.decode_point(M)
-		return decoded
-	
-
-	def encode_point(self, plaintext):
-		print("ENCODE_POINT")
-		plaintext = len(plaintext).to_bytes(1, byteorder="big") + plaintext
-		print('plaintext :' , plaintext)
-		x = int.from_bytes(plaintext, "big")
-		
-		y = self.compute_y(x)
-		
-		while True:
-			x = int.from_bytes(plaintext, "big")
-			y = self.compute_y(x)
-			if y:
-				return Point(x, y)
-			plaintext += urandom(1)
-
-
-	
-	def decode_point(self, M):
-		print("\n\nDECODE_POINT")
-		print('decode point', M)
-		print('type: ', type(M.x))
-
-		x = int(M.x)
-		print(x)
-		byte_len = int_length_in_byte(x)
-		print('byte len', byte_len)
-		plaintext_len = (x >> ((byte_len - 1) * 8)) & 0xff
-		print('plaintext len', plaintext_len)
-
-		shift = byte_len - plaintext_len - 1
-		print('shift', shift)
-
-		plaintext = ((x >> ( shift * 8))
-						& (int.from_bytes(b"\xff" * plaintext_len, "big")))
-		print('plain', plaintext)
-		return plaintext.to_bytes(plaintext_len, byteorder="big")
-	
-	
-	def encrypt_point(self, plaintext, public_key):
-
-		random.seed(urandom(1024))
-		k = random.randint(1, self.n)
-		
-		C1 = self.multiply(self.g, k)
-		
-		C2 = self.add(plaintext, self.multiply(public_key, k))
-
-		return C1, C2
-
-	def decrypt_point(self, private_key, ciphertext):
-		print("DECRYPT")
-		C1 = ciphertext[0]
-		C2 = ciphertext[1]
-		print(C1)
-		print(C2)
-
-		mul = self.multiply(C1, (self.n - private_key) )
-		print('mul', mul)
-		decrypted = self.add(C2, mul)
-		print('decrypted::', decrypted)
-		return decrypted
-
-
-
-
 
 
 if __name__ == "__main__":
 
-	plaintext = b"hi this is a message"
-
 	# ec = EllipticCurve('secp256k1')
 	ec = EllipticCurve('small')
-	# print(ec.g)
-
-	public_key = ec.gen_key_pair()
 
 	g = Point(2,7)
 
@@ -297,17 +162,7 @@ if __name__ == "__main__":
 	print(ec.multiply(g, 13))
 	print(ec.multiply(g, 14))
 
-	# print(ec.add(ec.g, ec.g))
-	# print(ec.double(ec.g))
-
-	# print(ec.add(Point(5,2), Point(7,9)))
-
-	print(modinv(3, ec.p))
-	# ec.encode_point(plaintext)
-
-	encrypted = ec.encrypt(plaintext, public_key)
-	# encoded = ec.encode_message(plaintext)
-	# ec.decode_message(encoded)
+	
 
 
 	
