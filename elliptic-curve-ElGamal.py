@@ -71,6 +71,8 @@ class EllipticCurve:
 				q = self.add(q, g)
 		return q
 
+
+	# generates a random private key in order n
 	def gen_private_key(self):
 		order_bits = 0
 		order = self.n
@@ -91,17 +93,16 @@ class EllipticCurve:
 
 		return rand
 
-	def generateKeyPair(self):
+	def gen_key_pair(self):
 
 		pubKey = (0.0, 0.0)
 		while pubKey == (0.0, 0.0):
 			self.privateKey =  self.gen_private_key()
 			
-			pubKey = self.multiply(self.g, self.privateKey)
-			print(pubKey)
+			pubKey = self.multiply(self.g, self.privateKey)	
 		return pubKey
 
 ec = EllipticCurve()
 
-print('public key', ec.generateKeyPair())
+print('public key', ec.gen_key_pair())
 print('private key', ec.privateKey)
