@@ -27,6 +27,7 @@ def curve_gcd(a, b):
 	else:
 		g, y, x = curve_gcd(b % a, a)
 		return g, x - (b//a) * y, y
+
 class EllipticCurve:
 
 	def __init__(self, curve=None):
@@ -160,9 +161,4 @@ if __name__ == "__main__":
 	print(ec.multiply(g, 11))
 	print(ec.multiply(g, 12))
 	print(ec.multiply(g, 13))
-	print(ec.multiply(g, 14))
-
-	
-
-
-	
+	print(ec.multiply(g, 14))	

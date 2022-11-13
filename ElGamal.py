@@ -16,7 +16,7 @@ def int_length_in_byte(n: int):
 
 class ElGamal:
 
-	def __init__(self, curve):
+	def __init__(self, curve=None):
 
 		self.curve = EllipticCurve(curve)
 		
@@ -129,3 +129,7 @@ class ElGamal:
 		decrypted = self.curve.add(C2, mul)
 		print('decrypted::', decrypted)
 		return decrypted
+
+if __name__ == "__main__":
+
+	elg = ElGamal()
