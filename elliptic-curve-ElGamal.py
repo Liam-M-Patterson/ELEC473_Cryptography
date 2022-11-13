@@ -1,3 +1,6 @@
+from os import urandom
+from binascii import hexlify
+
 INF_POINT = None
 class EllipticCurve:
 
@@ -13,12 +16,7 @@ class EllipticCurve:
 		self.g = (self.gx, self.gy)
 		
 		self.n = 0x00000000000000000001F4C8F927AED3CA752257
-
-		self.privateKey = 0x1053CDE42C14D696E67687561517533BF3F83345
-
-		self.points = []
-		self.definePoints()
-	
+		
 	
 	def modinv(self, a, n):
 		lm, hm = 1, 0 
@@ -56,11 +54,13 @@ class EllipticCurve:
 
 		return (x,y)
 
+	# use the double and add algorithm to speed up the multiplication
 	def multiply(self, g, scalar):
 
 		if scalar == 0 or scalar > self.n:
 			raise Exception("Invalid scalar")
 		
+		# convert to binary string
 		scalarBin = str(bin(scalar))[2:]
 		q = g
 
@@ -71,5 +71,37 @@ class EllipticCurve:
 				q = self.add(q, g)
 		return q
 
+	def gen_private_key(self):
+		order_bits = 0
+		order = self.n
+
+		while order > 0:
+			order >>= 1
+			order_bits += 1
+
+		order_bytes = (order_bits + 7) // 8
+		extra_bits = order_bytes * 8 - order_bits
+
+		rand = int(hexlify(urandom(order_bytes)), 16)
+		rand >>= extra_bits
+
+		while rand >= self.n:
+			rand = int(hexlify(urandom(order_bytes)), 16)
+			rand >>= extra_bits
+
+		return rand
+
+	def generateKeyPair(self):
+
+		pubKey = (0.0, 0.0)
+		while pubKey == (0.0, 0.0):
+			self.privateKey =  self.gen_private_key()
+			
+			pubKey = self.multiply(self.g, self.privateKey)
+			print(pubKey)
+		return pubKey
+
 ec = EllipticCurve()
 
+print('public key', ec.generateKeyPair())
+print('private key', ec.privateKey)
