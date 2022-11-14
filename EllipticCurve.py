@@ -143,13 +143,11 @@ class EllipticCurve:
 
 if __name__ == "__main__":
 
-	# ec = EllipticCurve('secp256k1')
 	ec = EllipticCurve('small')
 
 	g = Point(2,7)
 
 	print(g)
-
 	print(ec.multiply(g, 2))
 	print(ec.multiply(g, 3))
 	print(ec.multiply(g, 4))

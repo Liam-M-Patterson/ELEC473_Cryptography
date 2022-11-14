@@ -80,8 +80,10 @@ def main():
 
     en_msg, p = encrypt(msg, q, h, g)
     print("Encrypted Message :", en_msg)
+
     dr_msg = decrypt(en_msg, p, key, q)
     dmsg = ''.join(dr_msg)
+	
     print("Decrypted Message :", dmsg)  
 
 
