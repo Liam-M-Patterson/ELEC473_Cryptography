@@ -39,7 +39,6 @@ class EllipticCurve:
 			self.gx = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798
 			self.gy = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8
 			self.n = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
-			# self.n = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
 		
 		elif curve == 'secp224k1':
 			self.a = 0x0
@@ -50,6 +49,7 @@ class EllipticCurve:
 			self.n = 0x0001DCE8D2EC6184CAF0A971769FB1F7
 
 		elif curve == 'small':
+			# used to manually test the addition and multiplication operations were working
 			self.a = 1
 			self.b = 6
 			self.p = 11

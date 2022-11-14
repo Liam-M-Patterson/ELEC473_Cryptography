@@ -43,10 +43,10 @@ class ElGamal:
     def gen_key_pair(self):
 
         pubKey = Point(0.0, 0.0)
-        while pubKey.x == 0.0 or pubKey.y == 0.0 :
-            self.privateKey =  self.gen_private_key()
-            
-            pubKey = self.curve.multiply(self.curve.g, self.privateKey)	
+        # while pubKey.x == 0.0 or pubKey.y == 0.0 :
+        self.privateKey =  self.gen_private_key()
+        
+        pubKey = self.curve.multiply(self.curve.g, self.privateKey)	
         return pubKey
 
 
