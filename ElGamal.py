@@ -43,7 +43,6 @@ class ElGamal:
     def gen_key_pair(self):
 
         pubKey = Point(0.0, 0.0)
-        # while pubKey.x == 0.0 or pubKey.y == 0.0 :
         self.privateKey =  self.gen_private_key()
         
         pubKey = self.curve.multiply(self.curve.g, self.privateKey)	
@@ -101,14 +100,9 @@ class ElGamal:
         return C1, C2
 
     def decrypt_point(self, private_key, ciphertext):
+                
+        mul = self.curve.multiply(ciphertext[0], (self.curve.n - private_key) )
         
-        C1 = ciphertext[0]
-        C2 = ciphertext[1]
-        
-        diff = self.curve.n - private_key
-        
-        mul = self.curve.multiply(C1, diff )
-        
-        decrypted = self.curve.add(C2, mul)
+        decrypted = self.curve.add(ciphertext[1], mul)
         
         return decrypted

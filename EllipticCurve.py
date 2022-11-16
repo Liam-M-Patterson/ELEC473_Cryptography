@@ -1,18 +1,15 @@
 from mod_sqrt import modsqrt
-from typing import Optional
-from dataclasses import dataclass
-@dataclass
 class Point:
-	x: Optional[int]
-	y: Optional[int]
+	def __init__(self, x, y):
+		self.x = x
+		self.y = y
 
-	def is_at_infinity(self):
+	def isINF(self):
 		return self.x is None and self.y is None
 
 	def __eq__(self, rhs):
 		return self.x == rhs.x and self.y == rhs.y 
 	
-
 INF_POINT = Point(None, None)
 
 def modinv(a, n):
@@ -65,27 +62,21 @@ class EllipticCurve:
 			self.gy = 0x23A628553168947D59DCC912042351377AC5FB32
 			self.n = 0x00000000000000000001F4C8F927AED3CA752257
 
-			
-
 		self.g = Point(self.gx, self.gy)
-
-	def is_on_curve(self, p):
-
-		lhs = p.y * p.y
-		rhs = p.x*p.x*p.x + self.a*p.x + self.b
-
-		return p.is_at_infinity() or ( (lhs-rhs) % self.p == 0 )
 
 	def neg(self, p):
 		return Point(p.x, -p.y % self.p)
 
 	def add(self, p: Point, q: Point) -> Point:
 
-		if p.is_at_infinity():
+		# Q + INF = Q
+		if p.isINF():
 			return q
-		if q.is_at_infinity():
+		# P + INF = P
+		if q.isINF():
 			return p
 
+		# P + (-P) = INF
 		if p == self.neg(q):
 			return INF_POINT
 		
@@ -94,9 +85,10 @@ class EllipticCurve:
 		
 		_lambda = (q.y - p.y) * modinv( (q.x - p.x), self.p)
 	
-		x = (_lambda*_lambda - p.x - q.x) % self.p
+		x = (_lambda**2 - p.x - q.x) % self.p
 		y = ((p.x - x) * _lambda - p.y) % self.p
 
+		# if x or y are negative, find congruent positive number
 		while x < 0:
 			x += self.p
 		while y < 0:
@@ -104,13 +96,15 @@ class EllipticCurve:
 
 		return Point(x, y)
 
+	
 	def double(self, p):
 		
-		_lambda = (3*p.x*p.x + self.a) * modinv(2*p.y, self.p)
+		_lambda = (3*p.x**2 + self.a) * modinv(2*p.y, self.p)
 
-		x = (_lambda*_lambda - 2*p.x) % self.p
+		x = (_lambda**2 - 2*p.x) % self.p
 		y = ((p.x - x) * _lambda - p.y) % self.p
 
+		# if x or y are negative, find congruent positive number
 		while x < 0:
 			x += self.p
 		while y < 0:
@@ -118,31 +112,30 @@ class EllipticCurve:
 
 		return Point(x, y)
 
+	# use the double and add method to multiply the point by a scalar value
 	def multiply(self, point, scalar):
 
-		temp = Point(point.x, point.y)
+		result = Point(point.x, point.y)
 
-		scalarBin = bin(scalar)[2:]
-
-		for i in range(1, len(scalarBin)):
-			
-			temp = self.double(temp)
+		scalarBin = bin(scalar)[2:]		
+			 
+		for i in range(1, len(scalarBin)):	
+			result = self.double(result)
 
 			if scalarBin[i] == '1':
-				temp = self.add(temp, point)
+				result = self.add(result, point)
+			
+		return result	
 
-		return temp	
-
-
+	# get the value of y from the equation y^2 = x^3 + ax +b
 	def compute_y(self, x):
-		rhs = (x*x*x + self.a*x + self.b) % self.p
-		y =  modsqrt(rhs, self.p)
-		return y
-
-
+		rhs = (x**3 + self.a*x + self.b) % self.p
+		return modsqrt(rhs, self.p)
 
 if __name__ == "__main__":
 
+	# Used to confirm that the curve operations are working
+	# by using an example of an elliptic curve from class
 	ec = EllipticCurve('small')
 
 	g = Point(2,7)

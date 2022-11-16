@@ -14,12 +14,6 @@ f.write('publicKey: ' + str(public_key))
 f.write('\nprivateKey: ' + str(elGamal.privateKey))
 f.close()
 
-# public_key = Point(25024962262525698502770205732861504660561638012764540769648701223878633382935, 5650826348959461501987674807658357192370628245900910116341132296199316186022)
-# elGamal.privateKey = 31968960728532646400184016058511617644826269816445647592189348544428065195277
-# print('public key:', public_key)
-# print('private key:', elGamal.privateKey)
-# print('pub: ', public_key)
-
 ciphers = [elGamal.encrypt(chunk, public_key) for chunk in chunks]
 
 f = open("ciphertext.txt", "w")
