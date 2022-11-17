@@ -1,5 +1,7 @@
 from ElGamal import ElGamal
 
+# the curve specified according to the secp256k1 curve was used. 
+# specifc values associated with the curve can be found in the ElGamal constructor in ElGamal.py
 elGamal = ElGamal('secp256k1')
 public_key = elGamal.gen_key_pair()
 f = open("keys.txt", "w")
