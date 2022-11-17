@@ -1,4 +1,5 @@
 from mod_sqrt import modsqrt
+# defines an elliptic curve point
 class Point:
 	def __init__(self, x, y):
 		self.x = x
@@ -9,9 +10,13 @@ class Point:
 
 	def __eq__(self, rhs):
 		return self.x == rhs.x and self.y == rhs.y 
+
+	def __str__(self) -> str:
+		return '(x=' + str(self.x) + ', y=' + str(self.y) + ')'
 	
 INF_POINT = Point(None, None)
 
+# mod inv function
 def modinv(a, n):
 	a = a % n
 	g, x, y = curve_gcd(a, n)
